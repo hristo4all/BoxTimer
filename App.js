@@ -27,6 +27,7 @@ export default function App() {
       <View style={styles.timerWrap}>
         <Text style={styles.rounds}>Round 1 out of {numOfRounds}</Text>
         <Text style={styles.timer}>00:00</Text>
+        <Text style={styles.status}>Fight</Text>
       </View>
       <View style={styles.buttonWrap}>
         <AppButton icon="play-circle" title="Start" backgroundColor="black" onPress={test} borderRadius={15} fontSize={20} />
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   },
   timer: {
     fontSize: 80,
-    marginBottom: 80,
+    marginBottom: 5,
   },
   timerWrap: {
     width: 350,
@@ -82,6 +83,10 @@ const styles = StyleSheet.create({
   buttonWrap: {
     flexDirection: "row",
     margin: 5,
+  },
+  status: {
+    marginBottom: 20,
+    fontSize: 18,
   }
 
 });
