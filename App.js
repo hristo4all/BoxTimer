@@ -9,33 +9,46 @@ import AppButton from '../BoxingTimer/components/button'
 export default function App() {
 
   const [numOfRounds, setNumOfRounds] = useState(0);
-  const [roundTime, setRoundTime] = useState(0);
+  const [roundTime, setRoundTime] = useState(60);
   const [rest, setRest] = useState(0);
   const [warmUp, setWarmUp] = useState(0);
   const [timerOn, setTimerOn] = useState(false);
+  const [timer, setTimer] = useState();
+  const [originalRoundTime, setOriginalRoundTime] = useState(roundTime);
 
 
 
   useEffect(() => {
     if (timerOn) startTimer();
-    else BackgroundTimer.stopBackgroundTimer();
-    return () => {
-      BackgroundTimer.stopBackgroundTimer();
-    }
+    else pauseTimer();
+
   }, [timerOn])
 
+  useEffect(() => {
+    if (roundTime === 0) clearInterval(timer);
+  }, [roundTime])
 
-
-
-  const test = () => {
-    setNumOfRounds(4)
-  }
   const startTimer = () => {
-    setTimerOn(true)
+
+    setTimer(setInterval(() => {
+      setRoundTime(secs => {
+        if (secs > 0) return secs - 1
+        else return 0
+      })
+
+    }, 1000))
   }
-  const stopTimer = () => {
+  const pauseTimer = () => {
     setTimerOn(false)
+    clearInterval(timer);
   }
+
+  const stopTimer = () => {
+    clearInterval(timer);
+    setRoundTime(originalRoundTime);
+
+  }
+
   const clockify = () => {
     let mins = Math.floor((roundTime / 60) % 60);
     let seconds = Math.floor(roundTime % 60);
@@ -53,14 +66,16 @@ export default function App() {
     <View style={styles.container}>
       <View style={styles.timerWrap}>
         <Text style={styles.rounds}>Round 1 out of {numOfRounds}</Text>
-        <Text style={styles.timer}>00:00</Text>
+        <Text style={styles.timer}>{clockify().displayMins}:{clockify().displaySeconds}</Text>
+        <Text>{roundTime}</Text>
         <Text style={styles.status}>Fight</Text>
       </View>
       <View style={styles.buttonWrap}>
-        {!timerOn ? <AppButton icon="play-circle" title="Start" backgroundColor="black" onPress={startTimer} borderRadius={15} fontSize={20} />
-          : <AppButton icon="stop-circle" title="Stop" backgroundColor="black" onPress={stopTimer} borderRadius={15} fontSize={20} />}
+        {!timerOn ? <AppButton icon="play-circle" title="Start" backgroundColor="black" onPress={() => { setTimerOn((current) => !current) }} borderRadius={15} fontSize={20} />
+          : <AppButton icon="pause-circle" title="Pause" backgroundColor="black" onPress={pauseTimer} borderRadius={15} fontSize={20} />}
 
-        <AppButton icon="pause-circle" title="Pause" backgroundColor="black" onPress={test} borderRadius={15} fontSize={20} />
+
+        <AppButton icon="stop-circle" title="Stop" backgroundColor="black" onPress={stopTimer} borderRadius={15} fontSize={20} />
       </View>
       <View style={styles.wrap}>
         <Text>number of rounds </Text>
