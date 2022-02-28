@@ -1,0 +1,19 @@
+TO DO LIST 
+- Set number of rounds 
+- Set round duration
+- Set rest between rounds 
+- Set warm up before start 
+- Implement the background animation during count down 
+- Implement alerts 
+    - when round finishes
+    - when rest finishes
+    - when workout ends 
+
+
+
+
+
+
+RESOURCES:
+
+https://oblador.github.io/react-native-vector-icons/
