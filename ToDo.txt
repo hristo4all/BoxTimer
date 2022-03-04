@@ -1,7 +1,7 @@
 TO DO LIST 
 - Set number of rounds 
 - Set round duration
-- Set rest between rounds 
++ Set rest between rounds 
 - Set warm up before start 
 - Implement the background animation during count down 
 - Implement alerts 
