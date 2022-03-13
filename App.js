@@ -1,9 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { UseEffect, ueseState, useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Platform, Animated, Dimensions } from 'react-native';
+import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
 import AppButton from '../BoxingTimer/components/button'
 import { colors } from './utils/colors'
 
+const { width, height } = Dimensions.get('window');
 
 export default function App() {
 
@@ -19,7 +21,7 @@ export default function App() {
   const [originalRoundTime, setOriginalRoundTime] = useState(roundTime);
   const [originalRestTime, setOriginalRestTime] = useState(restTime);
 
-  const { width, height } = Dimensions.get('window');
+
 
   useEffect(() => {
     if (timerOn) startTimer();
@@ -66,6 +68,7 @@ export default function App() {
 
   const StartRestTime = () => {
     // push notification that rest is starting
+    animation();
     setRestTimer(setInterval(() => {
       setRestTime(secs => {
         if (secs > 0) return secs - 1
@@ -77,6 +80,7 @@ export default function App() {
 
   const startTimer = () => {
     // push notification that round is starting
+    animation();
     setTimer(setInterval(() => {
       setRoundTime(secs => {
         if (secs > 0) return secs - 1
@@ -111,7 +115,7 @@ export default function App() {
   }
 
 
-  const timerAnimation = React.useRef(new Animated.Value(height)).current;
+  const timerAnimation = React.useRef(new Animated.Value(height + 65)).current;
   const animation = React.useCallback(() => {
 
     Animated.sequence([
@@ -121,8 +125,8 @@ export default function App() {
         useNativeDriver: true
       }),
       Animated.timing(timerAnimation, {
-        toValue: height,
-        duration: roundTime * 1000,
+        toValue: height + 65,
+        duration: rest ? restTime * 1000 : roundTime * 1000,
         useNativeDriver: true
       })
     ]).start(() => {
@@ -136,23 +140,22 @@ export default function App() {
 
       {Platform.OS === 'ios' ? (<StatusBar backgroundColor="#36393E" barStyle="light-content" />) : <StatusBar style="light" />}
 
-      <Animated.View style={[StyleSheet.absoluteFillObject, { height, width, backgroundColor: colors.red, transform: [{ translateY: timerAnimation }] }]} />
+      <Animated.View style={[StyleSheet.absoluteFillObject, { height: height + 65, width, backgroundColor: rest ? colors.yellow : colors.red, transform: [{ translateY: timerAnimation }] }]} />
 
       <View style={styles.timerWrap}>
 
         <Text style={styles.rounds}>Round {rounds} out of {numOfRounds}</Text>
-
         {timerOn ? <Text style={styles.timer}>{clockify(roundTime).displayMins}:{clockify(roundTime).displaySeconds}</Text> :
           <Text style={styles.timer}>{clockify(restTime).displayMins}:{clockify(restTime).displaySeconds}</Text>}
         {timerOn ? <Text>Fight</Text> : <Text>Rest</Text>}
+
       </View>
       <View style={styles.buttonWrap}>
-        {!timerOn ? <AppButton icon="play-circle" title="Start" backgroundColor={colors.buttonColor} onPress={() => { setTimerOn((current) => !current) }} borderRadius={15} fontSize={20} />
+        {!timerOn ? <AppButton icon="play-circle" title="Start" backgroundColor={colors.buttonColor} onPress={setTimerOn} borderRadius={15} fontSize={20} />
           : <AppButton icon="pause-circle" title="Pause" backgroundColor={colors.buttonColor} onPress={pauseTimer} borderRadius={15} fontSize={20} />}
 
         <AppButton icon="stop-circle" title="Stop" backgroundColor={colors.buttonColor} onPress={stopTimer} borderRadius={15} fontSize={20} />
 
-        <AppButton icon="stop-circle" title="Start Animation" backgroundColor={colors.buttonColor} onPress={animation} borderRadius={15} fontSize={20} />
       </View>
     </View>
   );

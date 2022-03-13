@@ -5,5 +5,6 @@ export const colors = {
     textSecondary: "#FFD700",
     buttonColor: "#486581",
     red: "#F76A6A",
+    yellow: "#F7e66a",
 
 };
