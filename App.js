@@ -1,8 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { UseEffect, ueseState, useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform } from 'react-native';
-import BackgroundTimer from 'react-native-background-timer';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, Animated, Dimensions } from 'react-native';
 import AppButton from '../BoxingTimer/components/button'
 import { colors } from './utils/colors'
 
@@ -21,6 +19,7 @@ export default function App() {
   const [originalRoundTime, setOriginalRoundTime] = useState(roundTime);
   const [originalRestTime, setOriginalRestTime] = useState(restTime);
 
+  const { width, height } = Dimensions.get('window');
 
   useEffect(() => {
     if (timerOn) startTimer();
@@ -111,13 +110,36 @@ export default function App() {
     }
   }
 
+
+  const timerAnimation = React.useRef(new Animated.Value(height)).current;
+  const animation = React.useCallback(() => {
+
+    Animated.sequence([
+      Animated.timing(timerAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true
+      }),
+      Animated.timing(timerAnimation, {
+        toValue: height,
+        duration: roundTime * 1000,
+        useNativeDriver: true
+      })
+    ]).start(() => {
+
+    })
+
+  }, [roundTime])
+
   return (
     <View style={styles.container}>
-      {timerOn ? <Text style={{ color: "white" }}>True</Text> : <Text style={{ color: "white" }}>False</Text>}
-      {rest ? <Text style={{ color: "white" }}>True</Text> : <Text style={{ color: "white" }}>False</Text>}
-      <Text style={{ color: "white" }}>{roundTime}</Text>
+
+      {Platform.OS === 'ios' ? (<StatusBar backgroundColor="#36393E" barStyle="light-content" />) : <StatusBar style="light" />}
+
+      <Animated.View style={[StyleSheet.absoluteFillObject, { height, width, backgroundColor: colors.red, transform: [{ translateY: timerAnimation }] }]} />
 
       <View style={styles.timerWrap}>
+
         <Text style={styles.rounds}>Round {rounds} out of {numOfRounds}</Text>
 
         {timerOn ? <Text style={styles.timer}>{clockify(roundTime).displayMins}:{clockify(roundTime).displaySeconds}</Text> :
@@ -129,14 +151,9 @@ export default function App() {
           : <AppButton icon="pause-circle" title="Pause" backgroundColor={colors.buttonColor} onPress={pauseTimer} borderRadius={15} fontSize={20} />}
 
         <AppButton icon="stop-circle" title="Stop" backgroundColor={colors.buttonColor} onPress={stopTimer} borderRadius={15} fontSize={20} />
+
+        <AppButton icon="stop-circle" title="Start Animation" backgroundColor={colors.buttonColor} onPress={animation} borderRadius={15} fontSize={20} />
       </View>
-      <View style={styles.wrap}>
-        <Text>number of rounds </Text>
-        <Text>Set Round Time </Text>
-        <Text>Set Rest </Text>
-        <Text>warmUp </Text>
-      </View>
-      {Platform.OS === 'ios' ? (<StatusBar backgroundColor="#36393E" barStyle="light-content" />) : <StatusBar style="light" />}
     </View>
   );
 }
@@ -148,20 +165,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.background,
   },
-  wrap: {
-    padding: 30,
-    justifyContent: "space-between",
-    backgroundColor: colors.secondary,
-  },
   timer: {
     fontSize: 80,
     color: colors.text,
-    marginBottom: 5,
   },
   timerWrap: {
     width: 350,
     height: 250,
     margin: 20,
+    padding: 10,
+    left: 0,
+    right: 0,
     justifyContent: "space-between",
     backgroundColor: colors.secondary,
     alignItems: "center",
@@ -170,20 +184,15 @@ const styles = StyleSheet.create({
       width: 0,
       height: 4,
     },
-    elevation: 8,
+
   },
   rounds: {
-    marginTop: 10,
     fontSize: 18,
     color: colors.textSecondary,
   },
   buttonWrap: {
     flexDirection: "row",
     margin: 5,
-  },
-  status: {
-    marginBottom: 20,
-    fontSize: 18,
   }
 
 });
