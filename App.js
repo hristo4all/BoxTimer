@@ -7,6 +7,8 @@ import { colors } from './utils/colors'
 
 const { width, height } = Dimensions.get('window');
 
+let animValue = 0;
+
 export default function App() {
 
   const [numOfRounds, setNumOfRounds] = useState(4);
@@ -90,8 +92,10 @@ export default function App() {
     }, 1000))
   }
   const pauseTimer = () => {
-    setTimerOn(false)
+    setTimerOn(false);
+    Animated.timing(timerAnimation).stop();
     clearInterval(timer);
+    animValue = 0;
   }
 
   const stopTimer = () => {
@@ -115,7 +119,8 @@ export default function App() {
   }
 
 
-  const timerAnimation = React.useRef(new Animated.Value(height + 65)).current;
+  let timerAnimation = React.useRef(new Animated.Value(height + 65)).current;
+  timerAnimation.addListener(({ value }) => animValue = value); // used to track the current animation value 
   const animation = React.useCallback(() => {
 
     Animated.sequence([
@@ -133,7 +138,7 @@ export default function App() {
 
     })
 
-  }, [roundTime])
+  }, [roundTime, restTime])
 
   return (
     <View style={styles.container}>
@@ -145,6 +150,9 @@ export default function App() {
       <View style={styles.timerWrap}>
 
         <Text style={styles.rounds}>Round {rounds} out of {numOfRounds}</Text>
+        <Text>{animValue}</Text>
+        {rest ? <Text style={{ color: "white" }}>True</Text> : <Text style={{ color: "white" }}>False</Text>}
+
         {timerOn ? <Text style={styles.timer}>{clockify(roundTime).displayMins}:{clockify(roundTime).displaySeconds}</Text> :
           <Text style={styles.timer}>{clockify(restTime).displayMins}:{clockify(restTime).displaySeconds}</Text>}
         {timerOn ? <Text>Fight</Text> : <Text>Rest</Text>}
