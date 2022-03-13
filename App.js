@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { UseEffect, ueseState, useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Platform, Animated, Dimensions } from 'react-native';
-import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
 import AppButton from '../BoxingTimer/components/button'
 import { colors } from './utils/colors'
 
@@ -11,17 +10,17 @@ let animValue = 0;
 
 export default function App() {
 
-  const [numOfRounds, setNumOfRounds] = useState(4);
-  const [rounds, setRounds] = useState(1)
-  const [roundTime, setRoundTime] = useState(10);
-  const [restTime, setRestTime] = useState(5);
-  const [rest, setRest] = useState(false);
-  const [warmUp, setWarmUp] = useState(0);
-  const [timerOn, setTimerOn] = useState(false);
-  const [timer, setTimer] = useState();
-  const [restTimer, setRestTimer] = useState();
-  const [originalRoundTime, setOriginalRoundTime] = useState(roundTime);
-  const [originalRestTime, setOriginalRestTime] = useState(restTime);
+  const [numOfRounds, setNumOfRounds] = useState(4); // number of rounds 
+  const [rounds, setRounds] = useState(1) // current rounds 
+  const [roundTime, setRoundTime] = useState(10); // time of each round 
+  const [restTime, setRestTime] = useState(5); // rest time between rounds 
+  const [rest, setRest] = useState(false); // rest flag 
+  const [warmUp, setWarmUp] = useState(0); // warm up time 
+  const [timerOn, setTimerOn] = useState(false); // start round flag
+  const [timer, setTimer] = useState(); // state for the interval 
+  const [restTimer, setRestTimer] = useState(); // interval for the rest time  
+  const [originalRoundTime, setOriginalRoundTime] = useState(roundTime); // used to reset number of rounds 
+  const [originalRestTime, setOriginalRestTime] = useState(restTime); // used to reset rest  time 
 
 
 
