@@ -3,7 +3,7 @@ TO DO LIST
 - Set round duration
 + Set rest between rounds 
 - Set warm up before start 
-- Implement the background animation during count down 
++/- Implement the background animation during count down # fix pause animation and restart when round finishes
 - Implement alerts 
     - when round finishes
     - when rest finishes

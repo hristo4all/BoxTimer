@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { colors } from '../utils/colors'
 
-export default function AppButton({ onPress, icon, title, backgroundColor, borderRadius, fontSize }) {
+export default function AppButton({ onPress, icon, title, backgroundColor, iconColor, borderRadius, fontSize, height, width }) {
     return (
         <TouchableOpacity style={styles.container}>
             <Icon.Button
@@ -11,7 +11,8 @@ export default function AppButton({ onPress, icon, title, backgroundColor, borde
                 borderRadius={borderRadius}
                 backgroundColor={backgroundColor}
                 onPress={onPress}
-                style={styles.appButton}
+                color={iconColor}
+                style={[styles.appButton, width = { width }, height = { height }]}
             >
                 <Text style={[styles.appButtonText, fontSize = { fontSize }]}>{title}</Text>
             </Icon.Button>
@@ -20,16 +21,13 @@ export default function AppButton({ onPress, icon, title, backgroundColor, borde
 }
 const styles = StyleSheet.create({
     appButton: {
-        padding: 12,
+        paddingLeft: 15,
+
     },
     appButtonText: {
-        color: colors.textSecondary
+        color: colors.white,
     },
     container: {
         margin: 5,
-        justifyContent: 'center',
-        alignItems: "center",
-        alignContent: "center",
-
     }
 });

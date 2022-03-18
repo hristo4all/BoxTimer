@@ -1,8 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { UseEffect, ueseState, useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, Platform, Animated, Dimensions } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Platform, Animated, Dimensions, TextInput, SectionList, SafeAreaView, FlatList } from 'react-native';
 import AppButton from '../BoxingTimer/components/button'
 import { colors } from './utils/colors'
+import Modal from "react-native-modal";
+import { immediates } from 'react-native-timer';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -21,7 +24,30 @@ export default function App() {
   const [restTimer, setRestTimer] = useState(); // interval for the rest time  
   const [originalRoundTime, setOriginalRoundTime] = useState(roundTime); // used to reset number of rounds 
   const [originalRestTime, setOriginalRestTime] = useState(restTime); // used to reset rest  time 
+  const [isModalVisible, setModalVisible] = useState(false);
 
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const DATA = [
+
+    {
+      id: 'roundTime',
+      title: 'Round Time',
+      value: roundTime,
+    },
+    {
+      id: 'restTime',
+      title: 'Rest Time',
+      value: restTime,
+    },
+    {
+      id: 'numOfRounds',
+      title: '# of Rounds',
+      value: numOfRounds,
+    },
+  ];
 
 
   useEffect(() => {
@@ -139,9 +165,40 @@ export default function App() {
 
   }, [roundTime, restTime])
 
-  return (
-    <View style={styles.container}>
+  const Item = ({ title, value }) => (
+    <View style={{ flexDirection: "row", alignItems: "center", margin: 5, }}>
+      <Text style={{ color: "white" }}>{title}</Text>
+      <TextInput
+        style={styles.input}
+        keyboardType={"decimal-pad"}
+        value={`${value}`}
+      />
+    </View>
+  );
+  const renderItem = ({ item }) => (
+    <Item title={item.title} value={item.value} />
+  );
 
+  return (
+
+    <View style={styles.container}>
+      <Modal isVisible={isModalVisible}>
+        <View style={{ flex: 1 }}>
+
+          <SafeAreaView>
+            <FlatList
+              data={DATA}
+              renderItem={renderItem}
+              keyExtractor={item => item.id}
+            />
+          </SafeAreaView>
+
+          <AppButton icon="gears" title={"Save"} backgroundColor={colors.background} iconColor={colors.text} onPress={toggleModal} borderRadius={15} fontSize={20} />
+        </View>
+      </Modal>
+      <View style={styles.settingsContainer}>
+        <AppButton icon="gear" backgroundColor={colors.background} iconColor={colors.text} onPress={toggleModal} borderRadius={15} fontSize={20} />
+      </View>
       {Platform.OS === 'ios' ? (<StatusBar backgroundColor="#36393E" barStyle="light-content" />) : <StatusBar style="light" />}
 
       <Animated.View style={[StyleSheet.absoluteFillObject, { height: height + 65, width, backgroundColor: rest ? colors.yellow : colors.red, transform: [{ translateY: timerAnimation }] }]} />
@@ -158,12 +215,34 @@ export default function App() {
 
       </View>
       <View style={styles.buttonWrap}>
-        {!timerOn ? <AppButton icon="play-circle" title="Start" backgroundColor={colors.buttonColor} onPress={setTimerOn} borderRadius={15} fontSize={20} />
-          : <AppButton icon="pause-circle" title="Pause" backgroundColor={colors.buttonColor} onPress={pauseTimer} borderRadius={15} fontSize={20} />}
+        {!timerOn ? <AppButton icon="play-circle"
+          title="Start" backgroundColor={colors.secondary}
+          iconColor={colors.text}
+          onPress={setTimerOn} borderRadius={15}
+          fontSize={20}
+          width={100}
+          height={60} />
+          :
+          <AppButton icon="pause-circle"
+            title="Pause"
+            backgroundColor={colors.secondary}
+            iconColor={colors.text} onPress={pauseTimer}
+            borderRadius={15}
+            fontSize={20}
+            width={100}
+            height={60} />}
 
-        <AppButton icon="stop-circle" title="Stop" backgroundColor={colors.buttonColor} onPress={stopTimer} borderRadius={15} fontSize={20} />
-
+        <AppButton
+          icon="stop-circle"
+          title="Stop"
+          backgroundColor={colors.secondary}
+          iconColor={colors.text}
+          onPress={stopTimer} borderRadius={15}
+          fontSize={20}
+          width={100}
+          height={60} />
       </View>
+
     </View>
   );
 }
@@ -172,7 +251,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: colors.background,
   },
   timer: {
@@ -181,8 +259,8 @@ const styles = StyleSheet.create({
   },
   timerWrap: {
     width: 350,
-    height: 250,
     margin: 20,
+    marginTop: 60,
     padding: 10,
     left: 0,
     right: 0,
@@ -203,6 +281,20 @@ const styles = StyleSheet.create({
   buttonWrap: {
     flexDirection: "row",
     margin: 5,
-  }
+  },
+  settingsContainer: {
+    alignSelf: 'flex-end',
+    marginTop: 60,
+    backgroundColor: colors.background
+  },
+  input: {
+    backgroundColor: colors.white,
+    marginLeft: 5,
+    flex: 1,
+  },
 
+  header: {
+    fontSize: 32,
+    backgroundColor: "#fff"
+  },
 });
