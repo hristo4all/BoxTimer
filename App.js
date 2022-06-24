@@ -10,7 +10,7 @@ import { immediates } from 'react-native-timer';
 const { width, height } = Dimensions.get('window');
 
 let animValue = 0;
-
+let resetAnimValue = animValue;
 export default function App() {
 
   const [numOfRounds, setNumOfRounds] = useState(4); // number of rounds 
@@ -120,7 +120,7 @@ export default function App() {
     setTimerOn(false);
     Animated.timing(timerAnimation).stop();
     clearInterval(timer);
-    animValue = 0;
+    animValue = resetAnimValue;
   }
 
   const stopTimer = () => {
@@ -150,7 +150,7 @@ export default function App() {
 
     Animated.sequence([
       Animated.timing(timerAnimation, {
-        toValue: 0,
+        toValue: animValue,
         duration: 300,
         useNativeDriver: true
       }),
@@ -206,31 +206,34 @@ export default function App() {
       <View style={styles.timerWrap}>
 
         <Text style={styles.rounds}>Round {rounds} out of {numOfRounds}</Text>
-        <Text>{animValue}</Text>
+        <Text style={{ color: "white" }}>{animValue}</Text>
         {rest ? <Text style={{ color: "white" }}>True</Text> : <Text style={{ color: "white" }}>False</Text>}
 
-        {timerOn ? <Text style={styles.timer}>{clockify(roundTime).displayMins}:{clockify(roundTime).displaySeconds}</Text> :
+        {!rest ? <Text style={styles.timer}>{clockify(roundTime).displayMins}:{clockify(roundTime).displaySeconds}</Text> :
           <Text style={styles.timer}>{clockify(restTime).displayMins}:{clockify(restTime).displaySeconds}</Text>}
         {timerOn ? <Text>Fight</Text> : <Text>Rest</Text>}
 
       </View>
       <View style={styles.buttonWrap}>
-        {!timerOn ? <AppButton icon="play-circle"
-          title="Start" backgroundColor={colors.secondary}
-          iconColor={colors.text}
-          onPress={setTimerOn} borderRadius={15}
-          fontSize={20}
-          width={100}
-          height={60} />
+        {timerOn || rest ? <AppButton icon="pause-circle"
+          title="Pause"
+          backgroundColor={colors.secondary}
+          iconColor={colors.text} onPress={pauseTimer}
+          borderRadius={15}
+          fontSize={24}
+          width={110}
+          height={70}
+          iconSize={35} />
           :
-          <AppButton icon="pause-circle"
-            title="Pause"
-            backgroundColor={colors.secondary}
-            iconColor={colors.text} onPress={pauseTimer}
-            borderRadius={15}
-            fontSize={20}
-            width={100}
-            height={60} />}
+
+          <AppButton icon="play-circle"
+            title="Start" backgroundColor={colors.secondary}
+            iconColor={colors.text}
+            onPress={setTimerOn} borderRadius={15}
+            fontSize={24}
+            width={110}
+            height={70}
+            iconSize={35} />}
 
         <AppButton
           icon="stop-circle"
@@ -238,9 +241,10 @@ export default function App() {
           backgroundColor={colors.secondary}
           iconColor={colors.text}
           onPress={stopTimer} borderRadius={15}
-          fontSize={20}
-          width={100}
-          height={60} />
+          fontSize={24}
+          width={110}
+          height={70}
+          iconSize={35} />
       </View>
 
     </View>
