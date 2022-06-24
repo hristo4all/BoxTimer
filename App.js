@@ -13,6 +13,7 @@ let animValue = 0;
 let resetAnimValue = animValue;
 export default function App() {
 
+  /*
   const [numOfRounds, setNumOfRounds] = useState(4); // number of rounds 
   const [rounds, setRounds] = useState(1) // current rounds 
   const [roundTime, setRoundTime] = useState(10); // time of each round 
@@ -25,7 +26,20 @@ export default function App() {
   const [originalRoundTime, setOriginalRoundTime] = useState(roundTime); // used to reset number of rounds 
   const [originalRestTime, setOriginalRestTime] = useState(restTime); // used to reset rest  time 
   const [isModalVisible, setModalVisible] = useState(false);
+*/
 
+  const [fightTime, setFightTime] = useState(10); // time of each round 
+  const [restTime, setRestTime] = useState(5); // rest time between rounds
+  const [timerOn, setTimerOn] = useState(false); // start round flag
+  const [isFight, setIsFightOn] = useState(true); // start round flag
+  const [timer, setTimer] = useState(); // interval for the rest time  
+  const [numOfRounds, setNumOfRounds] = useState(4); // number of rounds 
+  const [rounds, setRounds] = useState(1) // current rounds 
+  const [isModalVisible, setModalVisible] = useState(false);
+  // have one timer for both round time and rest time
+  // timer has to accept time for round and time for rest
+  // START/STOP should manipulate the timer
+  // if fight is true then timer uses round time else use rest time
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
   };
@@ -35,7 +49,7 @@ export default function App() {
     {
       id: 'roundTime',
       title: 'Round Time',
-      value: roundTime,
+      value: fightTime,
     },
     {
       id: 'restTime',
@@ -51,68 +65,92 @@ export default function App() {
 
 
   useEffect(() => {
-    if (timerOn) startTimer();
-    else pauseTimer();
+    if (timerOn) {
+      console.log("timerOn")
+      //setIsFightOn(true)
+      startTimer()
+    }
+    else {
+      console.log("pauseTimer")
+      pauseTimer()
+    }
 
   }, [timerOn])
+  /*
+    useEffect(() => {
+      if (rest) StartRestTime();
+    }, [rest])*/
 
   useEffect(() => {
-    if (rest) StartRestTime();
-  }, [rest])
 
-  useEffect(() => {
-
-    if (roundTime === 0) {
+    if (fightTime === 0) {
       if (rounds != numOfRounds) {
-        setRoundTime(originalRoundTime);
+        setFightTime(10);// reset fight time
+        console.log("fight over")
         setTimerOn(false)
         setRounds(rounds + 1);
         // push notification that round is over
-        setRest(true);
+        setIsFightOn(false);
         clearInterval(timer)
+        // start rest timer
+        setTimerOn(true)
+        console.log(`timer: ${timerOn}`)
       }
       else {
         // push notification that the workout is over
         clearInterval(timer);
-        clearInterval(restTimer);
       }
 
     }
 
-  }, [roundTime])
+  }, [fightTime])
+
 
   useEffect(() => {
     if (restTime === 0) {
       // push notification that rest is over
-      setRestTime(originalRestTime)
-      setRest(false);
-      setTimerOn(true);
+      setRestTime(5)
+      setIsFightOn(true);
+      setTimerOn(false)
+      clearInterval(timer);
+      //setIsFightOn(true);
 
-      clearInterval(restTimer);
+      setTimerOn(true)
+      console.log(`timer: ${timerOn}`)
     }
   }, [restTime])
 
-
-  const StartRestTime = () => {
-    // push notification that rest is starting
-    animation();
-    setRestTimer(setInterval(() => {
-      setRestTime(secs => {
-        if (secs > 0) return secs - 1
-        else return 0
-      })
-
-    }, 1000))
-  }
-
+  /*
+    const StartRestTime = () => {
+      // push notification that rest is starting
+      animation();
+      setRestTimer(setInterval(() => {
+        setRestTime(secs => {
+          if (secs > 0) return secs - 1
+          else return 0
+        })
+  
+      }, 1000))
+    }*/
+  //isFight ? setFightTime : setRestTime
   const startTimer = () => {
     // push notification that round is starting
+    //setIsFightOn(false)
+    //setFlag(isFight ? setFightTime : setRestTime)
+    animValue = 0;
+    console.log("hello")
     animation();
     setTimer(setInterval(() => {
-      setRoundTime(secs => {
+      isFight ? setFightTime(secs => {
+        //console.log("fight timer")
+        if (secs > 0) return secs - 1
+        else return 0
+      }) : setRestTime(secs => {
+        //console.log("rest timer")
         if (secs > 0) return secs - 1
         else return 0
       })
+
 
     }, 1000))
   }
@@ -120,14 +158,18 @@ export default function App() {
     setTimerOn(false);
     Animated.timing(timerAnimation).stop();
     clearInterval(timer);
+    //clearInterval(restTime);
+
     animValue = resetAnimValue;
   }
 
   const stopTimer = () => {
     clearInterval(timer);
     setTimerOn(false)
-    setRoundTime(originalRoundTime);
-
+    setFightTime(10);
+    animValue = 0;
+    //reset animation so the red rectangle disappears
+    //reset number of rounds 
   }
 
   const clockify = (time) => {
@@ -156,14 +198,14 @@ export default function App() {
       }),
       Animated.timing(timerAnimation, {
         toValue: height + 65,
-        duration: rest ? restTime * 1000 : roundTime * 1000,
+        duration: isFight ? fightTime * 1000 : restTime * 1000,
         useNativeDriver: true
       })
     ]).start(() => {
 
     })
 
-  }, [roundTime, restTime])
+  }, [fightTime, restTime])
 
   const Item = ({ title, value }) => (
     <View style={{ flexDirection: "row", alignItems: "center", margin: 5, }}>
@@ -201,27 +243,29 @@ export default function App() {
       </View>
       {Platform.OS === 'ios' ? (<StatusBar backgroundColor="#36393E" barStyle="light-content" />) : <StatusBar style="light" />}
 
-      <Animated.View style={[StyleSheet.absoluteFillObject, { height: height + 65, width, backgroundColor: rest ? colors.yellow : colors.red, transform: [{ translateY: timerAnimation }] }]} />
+      <Animated.View style={[StyleSheet.absoluteFillObject, { height: height + 65, width, backgroundColor: isFight ? colors.red : colors.yellow, transform: [{ translateY: timerAnimation }] }]} />
 
       <View style={styles.timerWrap}>
 
         <Text style={styles.rounds}>Round {rounds} out of {numOfRounds}</Text>
         <Text style={{ color: "white" }}>{animValue}</Text>
-        {rest ? <Text style={{ color: "white" }}>True</Text> : <Text style={{ color: "white" }}>False</Text>}
+        {isFight ? <Text style={{ color: "white" }}>True</Text> : <Text style={{ color: "white" }}>False</Text>}
 
-        {!rest ? <Text style={styles.timer}>{clockify(roundTime).displayMins}:{clockify(roundTime).displaySeconds}</Text> :
+        {isFight ? <Text style={styles.timer}>{clockify(fightTime).displayMins}:{clockify(fightTime).displaySeconds}</Text> :
           <Text style={styles.timer}>{clockify(restTime).displayMins}:{clockify(restTime).displaySeconds}</Text>}
-        {timerOn ? <Text>Fight</Text> : <Text>Test</Text>}
+        {isFight ? <Text>Fight</Text> : <Text>Rest</Text>}
+        <Text>{fightTime}</Text>
+        <Text>{restTime}</Text>
 
       </View>
       <View style={styles.buttonWrap}>
-        {timerOn || rest ? <AppButton icon="pause-circle"
+        {timerOn ? <AppButton icon="pause-circle"
           title="Pause"
           backgroundColor={colors.secondary}
           iconColor={colors.text} onPress={pauseTimer}
           borderRadius={15}
           fontSize={24}
-          width={110}
+          width={130}
           height={70}
           iconSize={35} />
           :
@@ -231,7 +275,7 @@ export default function App() {
             iconColor={colors.text}
             onPress={setTimerOn} borderRadius={15}
             fontSize={24}
-            width={110}
+            width={130}
             height={70}
             iconSize={35} />}
 
@@ -242,7 +286,7 @@ export default function App() {
           iconColor={colors.text}
           onPress={stopTimer} borderRadius={15}
           fontSize={24}
-          width={110}
+          width={130}
           height={70}
           iconSize={35} />
       </View>
