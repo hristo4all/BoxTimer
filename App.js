@@ -211,7 +211,7 @@ export default function App() {
 
         {!rest ? <Text style={styles.timer}>{clockify(roundTime).displayMins}:{clockify(roundTime).displaySeconds}</Text> :
           <Text style={styles.timer}>{clockify(restTime).displayMins}:{clockify(restTime).displaySeconds}</Text>}
-        {timerOn ? <Text>Fight</Text> : <Text>Rest</Text>}
+        {timerOn ? <Text>Fight</Text> : <Text>Test</Text>}
 
       </View>
       <View style={styles.buttonWrap}>
